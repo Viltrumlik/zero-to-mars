@@ -1,61 +1,79 @@
-# 🚀 Noldan Marsgacha
+# 🚀 Zero to Mars (Noldan Marsgacha)
 
-Telegram WebApp ichida ishlaydigan 3D hayot simulyatori. O'yinchi 10 yoshli bola sifatida eski kompyuter bilan boshlaydi, kod yozadi, startaplar ochadi, raketalar uchiradi, milliarder bo'ladi va oxirida Marsda shahar quradi. Hayot yo'li Elon Musk'nikiga o'xshaydi, lekin qahramon va kompaniyalar to'qima: CityMap, PayNova, Orbitra, Voltra, SunGrid, BoreCo, NeuroBridge.
+A 3D life simulator that runs as a **Telegram Mini App**. You start as a 10-year-old kid with $0 and a dream of reaching Mars. Deliver newspapers, wash cars, learn to code, buy your first computer, move abroad, found startups, launch rockets, become a billionaire and finally build a city on Mars.
 
-O'yin uch tilda: o'zbek, rus va ingliz. Til Telegram sozlamasidan avtomatik aniqlanadi.
+The hero's path is inspired by Elon Musk's biography, but the hero and every company in the game are fictional: CityMap, PayNova, Orbitra, Voltra, SunGrid, BoreCo, NeuroBridge.
 
-## O'yin mexanikasi
+The game is available in **Uzbek, Russian and English**; the language is detected from Telegram automatically.
 
-| Mexanika | Qanday ishlaydi |
+## Features
+
+| | |
 |---|---|
-| **Story mode** | O'yin kinematik kirish sahnalari bilan boshlanadi, keyin 34 ta syujetli vazifa zanjiri boradi: gazeta tarqatish → velosiped → kompyuter → birinchi o'yin → chet el → CityMap → PayNova → raketalar → Mars. |
-| **3D shahar** | Yo'llar, harakatlanuvchi mashinalar va 20 ta ichiga kirsa bo'ladigan bino. Qahramon joystik yoki klaviatura bilan yuradi, binoni bossangiz o'zi yuradi (A* yo'l topish). |
-| **Real ishlar** | Tap bilan pul ishlash yo'q. Har bir ish o'z mini-o'yini: yetkazib berish (shahar bo'ylab yugurish), kassa (qaytim hisoblash), ta'mirlash (xotira), dasturlash (kod qatorlarini terish), tozalash (barmoq bilan artish). Maosh natijaga bog'liq. |
-| **Hayot** | O'yin vaqti (kun va soat, kechasi qorong'i), energiya, ochlik, sog'liq. Har 3 kun = 1 yosh. 1-bosqichdan boshlab har kecha ijara to'lanadi. |
-| **Juda qiyin** | Maoshlar past, narxlar baland, ishlar yosh, buyum va ko'nikma talab qiladi, binolar ma'lum soatlarda ochiq. Ochlikdan yiqilsangiz, kasalxona hisobi qarzga yoziladi va qarzga har kecha 5% foiz qo'shiladi. |
-| **Doimiy tutorial** | Ekranda joriy vazifa va uning bajarilishi, maqsad binoda mayoq, qahramon oyog'i ostida yo'nalish o'qi, kontekstli maslahatlar va ogohlantirishlar, ❓ qo'llanma. |
-| **Bizneslar** | CityMap bosqichidan (24 yosh) ochiladi va real vaqtda, siz yo'qligingizda ham (3 soatgacha) daromad keltiradi. |
-| **Ijtimoiy** | Global va do'stlar reytingi, referal bonuslari, kunlik mukofot. |
+| **3D city** | 5×5 city blocks with roads, traffic, pedestrians and 20 enterable buildings. Walk with a joystick or the keyboard, or tap a building and the hero walks there by himself (A* pathfinding). |
+| **Real jobs, no tapping** | There is no tap-to-earn. Every job is a mini-game and your score decides the wage: delivery routes across the city, cashier (count the exact change), PC repair (memory sequence), coding (assemble the program in the right order), car wash and boiler cleaning (scrub with your finger). |
+| **Story mode** | A cinematic intro, then a 34-quest campaign across 7 life chapters: childhood → abroad → CityMap → PayNova → the big bet → empire → Mars. |
+| **Life simulation** | In-game clock with day and night, energy, food and health. Every 3 days you age one year. From the second chapter on you pay rent every night. |
+| **Extremely hard** | Low wages, high prices, jobs gated by age, items and skills, buildings with opening hours. Collapse from hunger and the hospital bill becomes debt that grows 5% every night. |
+| **Persistent tutorial** | Current quest with live progress always on screen, a beacon on the target building, a direction arrow at the hero's feet, contextual tips, warnings and a help screen. |
+| **Businesses** | Unlock in the CityMap chapter (age 24) and earn in real time, even while you are away (up to 3 hours). |
+| **Social** | Global and friends leaderboards, referral bonuses, daily rewards. |
+| **Graphics settings** | Low / Medium / High / Ultra presets plus individual shadows, glow, resolution, view distance, traffic density, FPS meter and auto-optimization. |
 
-## Tuzilishi
+## Tech stack
+
+- **Client:** React 19, Three.js via React Three Fiber, `@react-three/drei`, `@react-three/postprocessing`, Zustand, Vite.
+- **Server:** Node.js 24 (runs TypeScript directly via type stripping), Fastify 5, built-in `node:sqlite`, grammY for the Telegram bot.
+- **Shared:** one deterministic game engine used by both the client (instant prediction) and the server (authoritative replay).
+- **Deploy:** Docker + Caddy (automatic HTTPS).
+
+### Anti-cheat
+
+The client applies every action instantly and queues it for the server. The server replays the actions with the same engine and clamps their timestamps to its own clock, so a client cannot fast-forward time, finish a job faster than its minimum real duration or fake money. Telegram `initData` is validated with HMAC.
+
+### Performance
+
+The city is generated procedurally and merged into a few meshes per block (one per material), so a frame takes about 40 draw calls. Cars and pedestrians are drawn with instanced meshes. Blocks outside the camera are culled.
+
+## Project structure
 
 ```
-shared/   iqtisod dvigateli + kontent (klient ham, server ham ishlatadi)
-  src/engine.ts          deterministik o'yin qoidalari
-  src/content/*.ts       bosqichlar, bizneslar, ko'nikmalar, voqealar (3 tilda)
-client/   Vite + React + react-three-fiber (Three.js) + postprocessing
-  src/scene/             3D orol, binolar, qahramon, raketa
-  src/ui/                HUD, panellar, modal oynalar
-  src/store.ts           holat va server bilan sinxronlash
-server/   Fastify + node:sqlite + grammY bot (Node 24 TypeScript'ni to'g'ridan-to'g'ri ishlatadi)
-scripts/balance.ts       iqtisod balansini simulyatsiya qilish
+shared/                 game engine + content (used by client and server)
+  src/engine.ts         deterministic rules: time, needs, jobs, quests, economy
+  src/content/*.ts      eras, buildings, jobs, shop, quests, events (3 languages)
+  test/                 engine tests and a scripted player bot
+client/                 Vite + React + React Three Fiber
+  src/scene/            3D city, hero, traffic, markers, rocket
+  src/minigames/        the four job mini-games
+  src/ui/               HUD, building panel, menus, story and dialogs
+  src/store.ts          game state, sync with the server, tutorial
+server/                 Fastify API, SQLite, Telegram bot
+scripts/balance.ts      economy balance simulation
 ```
 
-**Firibgarlikdan himoya.** Klient har bir harakatni darhol o'zida ko'rsatadi, so'ng uni serverga yuboradi. Server o'sha dvigatel bilan harakatlarni qayta o'ynab chiqadi va vaqtni o'z soati bo'yicha cheklaydi. Shu sabab klient vaqtni oldinga surib yoki soxta tap yuborib pul qo'sha olmaydi. Telegram `initData` HMAC imzosi bilan tekshiriladi.
+## Getting started
 
-## Lokal ishga tushirish
-
-Node.js 24 yoki undan yangi versiyasi kerak.
+Requires **Node.js 24** or newer.
 
 ```bash
 npm install
 ```
 
-API va bot (dev rejimi, Telegram'siz kirish mumkin):
+Run the API and bot in dev mode (outside Telegram a dev account is used):
 
 ```bash
 npm run dev:server
 ```
 
-Ikkinchi terminalda 3D klient (`http://localhost:5173`):
+In a second terminal, run the 3D client at http://localhost:5173:
 
 ```bash
 npm run dev
 ```
 
-Telegram'dan tashqarida, ya'ni oddiy brauzerda, o'yin dev hisob bilan ishlaydi. Server bo'lmasa oflayn rejimga o'tadi va holat brauzerda saqlanadi.
+Without a server the game falls back to offline mode and keeps the save in the browser.
 
-## Tekshiruvlar
+## Testing
 
 ```bash
 npm test
@@ -69,13 +87,13 @@ npm run typecheck
 npm run balance
 ```
 
-`npm run balance` syujet bo'yicha o'ynaydigan bot bilan har bir bosqich necha o'yin kuni va necha soat faol o'yin olishini ko'rsatadi. Hozirgi sozlamada Marsgacha taxminan 30 soat faol o'yin kerak. Qiyinlikni `shared/src/content/city.ts` (maosh va narxlar), `shared/src/content/quests.ts` va `shared/src/engine.ts` dagi konstantalar bilan sozlash mumkin.
+`npm run balance` lets a scripted bot play the story and prints how many in-game days and hours of active play each life chapter takes. With the current tuning, reaching Mars takes about 30 hours of active play. Difficulty is tuned in `shared/src/content/city.ts` (wages and prices), `shared/src/content/quests.ts` and the constants in `shared/src/engine.ts`.
 
-## Telegram'ga joylash
+## Deploying to Telegram
 
-Bosqichma-bosqich qo'llanma (BotFather, domen, Docker, HTTPS, zaxira nusxa): **[DEPLOY.md](DEPLOY.md)**.
+A step-by-step guide (BotFather, domain, Docker, HTTPS, backups) is in **[DEPLOY.md](DEPLOY.md)** (written in Uzbek).
 
-Qisqacha:
+Short version:
 
 ```bash
 cp .env.example .env
@@ -84,3 +102,9 @@ cp .env.example .env
 ```bash
 docker compose up -d --build
 ```
+
+Fill in `BOT_TOKEN`, `BOT_USERNAME`, `DOMAIN` and `WEBAPP_URL` in `.env` first. Every variable is documented in [.env.example](.env.example).
+
+## License
+
+[MIT](LICENSE) © 2026 Viltrumlik
