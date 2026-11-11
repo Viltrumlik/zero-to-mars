@@ -6,6 +6,13 @@ The hero's path is inspired by Elon Musk's biography, but the hero and every com
 
 The game is available in **Uzbek, Russian and English**; the language is detected from Telegram automatically.
 
+## Screenshots
+
+|  |  |  |  |
+|:--:|:--:|:--:|:--:|
+| ![Cinematic intro over the 3D city](docs/screenshots/story.png) | ![Walking the city with the HUD and joystick](docs/screenshots/city.png) | ![Inside a building: sleep, jobs, study and shop](docs/screenshots/building.png) | ![The newspaper delivery mini-game](docs/screenshots/job.png) |
+| A cinematic intro opens the story | Walk the 3D city with the joystick, or tap a building and the hero walks there | Every building has its own jobs, study options and shop, gated by age, skills and items | Jobs are timed mini-games, not tap-to-earn — your score sets the wage |
+
 ## Features
 
 | | |
