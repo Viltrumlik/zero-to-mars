@@ -6,6 +6,8 @@ The hero's path is inspired by Elon Musk's biography, but the hero and every com
 
 The game is available in **Uzbek, Russian and English**; the language is detected from Telegram automatically.
 
+**▶ Play it now: [mars.viltrumlik.uz](https://mars.viltrumlik.uz)** — the full game in your browser, no Telegram account needed. Progress is saved in the browser.
+
 ## Screenshots
 
 |  |  |  |  |
